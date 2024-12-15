@@ -1,4 +1,5 @@
-// copy code of box example in ch6
+//fix : struct ObjectConstants, function BoxApp::Update() and hlsl file
+//fix : 구조체 ObjectConstants, 함수 BoxApp::Update(), hlsl 파일
 
 #include "../../Common/d3dApp.h"
 #include "../../Common/MathHelper.h"
@@ -17,6 +18,7 @@ struct Vertex
 struct ObjectConstants
 {
 	XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+	float TotalTime;
 };
 
 class BoxApp : public D3DApp
@@ -137,10 +139,11 @@ void BoxApp::OnResize()
 
 void BoxApp::Update(const GameTimer& gt)
 {
+
 	//구면좌표를 직교좌표로 변환
 	float x = mRadius * sinf(mPhi) * cosf(mTheta);
 	float z = mRadius * sinf(mPhi) * sinf(mTheta);
-	float y = mRadius * cosf(mPhi); 
+	float y = mRadius * cosf(mPhi);
 
 	//시야행렬
 	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
@@ -157,6 +160,7 @@ void BoxApp::Update(const GameTimer& gt)
 	//상수 버퍼 갱신
 	ObjectConstants objConstants;
 	XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+	objConstants.TotalTime = gt.TotalTime();
 	mObjectCB->CopyData(0, objConstants); // 왜 직접적으로 안하고 새로 인스턴스를 만들어서 복사하는거지???
 }
 
@@ -186,12 +190,12 @@ void BoxApp::Draw(const GameTimer& gt)
 
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-	mCommandList->IASetVertexBuffers(0, 1, &mBoxGeo->VertexBufferView()); // BOX개체 그리는 방법(색x) 올리기
-	mCommandList->IASetIndexBuffer(&mBoxGeo->IndexBufferView());
+	mCommandList->IASetVertexBuffers(0, 1, &mBoxGeo->VertexBufferView()); // BOX개체 그리는 점들 올리기
+	mCommandList->IASetIndexBuffer(&mBoxGeo->IndexBufferView()); // 점을 잇는 방법?
 	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart()); // ??
-	
+
 	mCommandList->DrawIndexedInstanced(mBoxGeo->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
 
 	//상태 전이
@@ -287,7 +291,7 @@ void BoxApp::BuildConstantBuffers()
 void BoxApp::BuildRootSignature()
 {
 	//루트 서명은 셰이더 프로그램이 기대하는 자원들을 정의한다
-	
+
 	//루트 매개변수는 서술자 테이블이거나 루트 서술자 또는 루트 상수이다
 	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
 
@@ -323,8 +327,8 @@ void BoxApp::BuildShadersAndInputLayout()
 {
 	HRESULT hr = S_OK;
 
-	mvsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
-	mpsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
+	mvsByteCode = d3dUtil::CompileShader(L"D:\\DX3D12_practice\\ch6\\Shaders\\colorexercise14.hlsl", nullptr, "VS", "vs_5_0"); // 절대경로로 임의로 수정함
+	mpsByteCode = d3dUtil::CompileShader(L"D:\\DX3D12_practice\\ch6\\Shaders\\colorexercise14.hlsl", nullptr, "PS", "ps_5_0");
 
 	mInputLayout = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },

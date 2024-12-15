@@ -173,6 +173,13 @@ struct MeshGeometry
 	Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferUploader = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
 
+    //예제를 위한 임시 추가
+    Microsoft::WRL::ComPtr<ID3DBlob> ColorVertexBufferCPU = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> ColorVertexBufferGPU = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> ColorVertexBufferUploader = nullptr;
+    UINT ColorVertexByteStride = 0;
+    UINT ColorVertexBufferByteSize = 0;
+
     // Data about the buffers.
 	UINT VertexByteStride = 0;
 	UINT VertexBufferByteSize = 0;
@@ -193,6 +200,17 @@ struct MeshGeometry
 
 		return vbv;
 	}
+
+    //예제를 위한 임시 추가
+    D3D12_VERTEX_BUFFER_VIEW ColorVertexBufferView()const
+    {
+        D3D12_VERTEX_BUFFER_VIEW c_vbv;
+        c_vbv.BufferLocation = ColorVertexBufferGPU->GetGPUVirtualAddress();
+        c_vbv.StrideInBytes = ColorVertexByteStride;
+        c_vbv.SizeInBytes = ColorVertexBufferByteSize;
+
+        return c_vbv;
+    }
 
 	D3D12_INDEX_BUFFER_VIEW IndexBufferView()const
 	{
