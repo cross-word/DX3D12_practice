@@ -1,4 +1,8 @@
-// copy code of box example in ch6
+//***************************************************************************************
+// ShapesApp.cpp by Frank Luna (C) 2015 All Rights Reserved.
+//
+// Hold down '1' key to view scene in wireframe mode.
+//***************************************************************************************
 
 #include "../../../Common/d3dApp.h"
 #include "../../../Common/MathHelper.h"
